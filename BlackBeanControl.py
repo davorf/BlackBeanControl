@@ -10,7 +10,7 @@ AlternativeIPAddress = ''
 AlternativePort = ''
 
 try:
-    Options, args = getopt.getopt(sys.argv[1:], 'c:iph', ['command=','ipaddress','port'])
+    Options, args = getopt.getopt(sys.argv[1:], 'c:iph', ['command=','ipaddress=','port=','help'])
 except getopt.GetoptError:
     print('BlackBeanControl.py -c <Command name> [-i <IP Address>] [-p <Port>]')
     sys.exit(2)
