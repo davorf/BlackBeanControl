@@ -16,7 +16,7 @@ except getopt.GetoptError:
     sys.exit(2)
 
 for Option, Argument in Options:
-    if Option == '-h':
+    if Option in ('-h', '--help'):
         print('BlackBeanControl.py -c <Command name> [-i <IP Address>] [-p <Port>]')
         sys.exit()
     elif Option in ('-c', '--command'):
