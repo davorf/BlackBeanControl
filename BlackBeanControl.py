@@ -1,5 +1,6 @@
 import socket, configparser
 import sys, getopt
+import os, binascii
 import Settings
 
 SettingsFile = configparser.ConfigParser()
@@ -36,15 +37,14 @@ if AlternativePort.strip() != '':
 else:
     RealPort = Settings.Port
 
-RealCommand = SettingsFile.get('Commands', SentCommand)
+CommandFromSettings = SettingsFile.get('Commands', SentCommand)
+FirstRandomPart = binascii.b2a_hex(os.urandom(2))
+SecondRandomPart = binascii.b2a_hex(os.urandom(2))
+CommandToSend = CommandFromSettings[0:64] + FirstRandomPart.decode('utf-8') + CommandFromSettings[68:80] + SecondRandomPart.decode('utf-8') + CommandFromSettings[84:432]
         
 RMSocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, 0)
 
-UDPData = bytearray.fromhex(Settings.DummyCommand)
-RMSocket.connect((RealIPAddress, int(RealPort)))
-RMSocket.send(UDPData)
-
-UDPData = bytearray.fromhex(RealCommand)
+UDPData = bytearray.fromhex(CommandToSend)
 RMSocket.connect((RealIPAddress, int(RealPort)))
 RMSocket.send(UDPData)
  

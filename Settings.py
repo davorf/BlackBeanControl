@@ -9,4 +9,3 @@ Settings.read(BlackBeanControlSettings)
 
 IPAddress = Settings.get('General', 'IPAddress')
 Port = Settings.get('General', 'Port')
-DummyCommand = Settings.get('General', 'DummyCommand')
