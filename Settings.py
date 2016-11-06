@@ -9,3 +9,5 @@ Settings.read(BlackBeanControlSettings)
 
 IPAddress = Settings.get('General', 'IPAddress')
 Port = Settings.get('General', 'Port')
+MACAddress = Settings.get('General', 'MACAddress')
+Timeout = Settings.get('General', 'Timeout')
