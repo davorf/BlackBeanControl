@@ -9,7 +9,7 @@ Before cloning/downloading the script, you should install all dependencies:
 - Install configparser package: python -m pip install configparser
 - Install netaddr package: python -m pip install netaddr
 - Install pycrypto package: python -m pip install pycrypto
-- Download python-broadlink package - you can find it on github by the package name (github user: mjg59)
+- Download python-broadlink package - you can find it on the github by the package name (github user: mjg59)
 - Unzip it to some local folder and install it: setup.py install
 
 Now you can clone/download BlackBeanControl (in case you download it as archive, unzip it to some local folder).
@@ -25,7 +25,7 @@ All required configuration is held within BlackBeanControl.ini file. It consists
 - Timeout - a time in seconds script should wait for an answer after starting a learn process (should be less then 60 seconds)
 
 [Commands]
-This section should be populated by using the script, not manually
+- This section should be populated by using the script, not manually
 
 ### Syntax and usage
 
