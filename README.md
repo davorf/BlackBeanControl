@@ -6,8 +6,15 @@ A simple Python 2 script, which uses python-broadlink package. It can be used fo
 
 Before cloning/downloading the script, you should install all dependencies: 
 
-- Install pip by downloading: wget https://bootstrap.pypa.io/get-pip.py and running get-pip.py
-- Install python-dev, which is needed for the pycrypto package: apt-get install python-dev
+Prerequisites for Linux users:
+
+- Install pip package: 
+      * wget https://bootstrap.pypa.io/get-pip.py 
+      * Run get-pip.py
+- Install python-dev package: apt-get install python-dev
+
+Dependencies for Windows/Linux:
+
 - Install configparser package: python -m pip install configparser
 - Install netaddr package: python -m pip install netaddr
 - Install pycrypto package: python -m pip install pycrypto
