@@ -13,6 +13,12 @@ Prerequisites for Linux users:
       * Run get-pip.py
 - Install python-dev package: apt-get install python-dev
 
+Prerequisites for Windows users:
+
+- Install Microsoft Visual C++ Compiler for Python 2.7
+      * Download https://www.microsoft.com/en-us/download/details.aspx?id=44266
+      * Run VCforPython27.msi
+
 Dependencies for Windows/Linux:
 
 - Install configparser package: python -m pip install configparser
