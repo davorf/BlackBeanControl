@@ -31,7 +31,7 @@ Now you can clone/download BlackBeanControl (in case you download it as archive,
 
 ### Configuration
 
-All required configuration is held within BlackBeanControl.ini file. It consists of the following options: 
+All required configuration is held within BlackBeanControl.ini file. It consists of the following parameters: 
 
 [General]
 - IPAddress - an IP address of RM 3 Mini (RM 3 Mini must have local IP address)
@@ -42,12 +42,28 @@ All required configuration is held within BlackBeanControl.ini file. It consists
 [Commands]
 - This section should be populated by using the script, not manually
 
-### Syntax and usage
+Configuration file could optionally contain multiple device sections (with a custom names, must not contain any blanks). The device section must have all the parameters General section has. It allows user to control multiple RM 3 Minis without passing all the parameters separately (IP Address, Port, MAC Address and Timeout). Instead, only -d (--device) parameter should be passed, with a section name containing connection parameters for the specific device. 
 
-BlackBeanControl.py -c \<Command name> [-i \<IP Address>] [-p \<Port>] [-m \<MAC Address>]
+#### Example of a custom device section:
+```
+[RM3LivingRoom]
+IPAddress = 192.168.0.1
+Port = 80
+MACAddress = AA:BB:CC:DD:EE:FF
+Timeout = 30
+```
+
+### Syntax and usage
+```
+BlackBeanControl.py -c <Command name> [-d <Device name>] [-i <IP Address>] [-p <Port>] [-m <MAC Address>] [-t <Timeout>]
+```
 
 Parameters explanation: 
 - Command name - mandatory parameter. If the sript is called with a command name not contained in the configuration file (BlackBeanControl.ini), it will start a learning process. After putting RM 3 Mini in the learning state, IR command should be sent to RM 3 Mini (usually a button press on the remote control). When defined timout expires, captured IR command will be saved in the configuration file - in the [Commands] section. In case the script is called with a command name contained in the configuration file, it will send that command to RM 3 Mini.
-- IP Address - optional parameter. If the script is called with IP Address parameter, IP address found in the configuration file will be ignored, and script will use IP address from this parameter
-- Port - optional parameter. If the script is called with Port parameter, port found in the configuration file will be ignored, and script will use port from this parameter
-- MAC Address - optional parameter. If the script is called with MAC address parameter, MAC address found in the configuration file will be ignored, and script will use MAC address from this parameter
+- Device name - optional parameter. If the script is called with Device name parameter, IP address, port, MAC address and timeout parameters found in the General section of the configuration file will be ignored, and a script will use parameters found in a device section of the configuration file. Device name parameter can not be used in conjunction with IP Address, Port, MAC Address and Timeout command line parameters.
+- IP Address - optional parameter. If the script is called with IP Address parameter, IP address found in the configuration file will be ignored, and a script will use IP address from this parameter.
+- Port - optional parameter. If the script is called with Port parameter, port found in the configuration file will be ignored, and a script will use port from this parameter.
+- MAC Address - optional parameter. If the script is called with MAC address parameter, MAC address found in the configuration file will be ignored, and a script will use MAC address from this parameter.
+- Timeout - optional parameter. If the script is called with Timeout parameter, Timeout found in the configuration file will be ignored, and a script will use Timeout from this parameter.
+
+IP Address, Port, MAC Address and Timeout command line parameters can not be used separately.
