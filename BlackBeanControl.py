@@ -149,7 +149,7 @@ if RealTimeout.strip() == '':
 else:
     RealTimeout = int(RealTimeout.strip())    
 
-RM3Device = broadlink.device((RealIPAddress, RealPort), RealMACAddress)
+RM3Device = broadlink.rm((RealIPAddress, RealPort), RealMACAddress)
 RM3Device.auth()
 
 RM3Key = RM3Device.key
