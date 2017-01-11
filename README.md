@@ -55,7 +55,7 @@ Timeout = 30
 
 ### Syntax and usage
 ```
-BlackBeanControl.py -c <Command name> [-d <Device name>] [-i <IP Address>] [-p <Port>] [-m <MAC Address>] [-t <Timeout>]
+BlackBeanControl.py -c <Command name> [-d <Device name>] [-i <IP Address>] [-p <Port>] [-m <MAC Address>] [-t <Timeout>] [-r <Re-key Command>]
 ```
 
 Parameters explanation: 
