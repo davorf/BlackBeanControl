@@ -156,21 +156,26 @@ else:
 RM3Device = broadlink.rm((RealIPAddress, RealPort), RealMACAddress)
 RM3Device.auth()
 
-if(RekeyCommand):
+if RekeyCommand:
     if SettingsFile.has_option('Commands', SentCommand):
         CommandFromSettings = SettingsFile.get('Commands', SentCommand)
-        RM3Key = RM3Device.key
-        RM3IV = RM3Device.iv
-        DecodedCommand = binascii.unhexlify(CommandFromSettings)
-        AESEncryption = AES.new(str(RM3Key), AES.MODE_CBC, str(RM3IV))
-        EncodedCommand = AESEncryption.encrypt(str(DecodedCommand))
-        FinalCommand = EncodedCommand[0x04:]
-        EncodedCommand = FinalCommand.encode('hex')
-        BlackBeanControlIniFile = open(path.join(Settings.ApplicationDir, 'BlackBeanControl.ini'), 'w')
-        SettingsFile.set('Commands', SentCommand, EncodedCommand)
-        SettingsFile.write(BlackBeanControlIniFile)
-        BlackBeanControlIniFile.close()
-        sys.exit()
+        print CommandFromSettings[0:4]
+        if CommandFromSettings[0:4] != '2600':
+            RM3Key = RM3Device.key
+            RM3IV = RM3Device.iv
+            DecodedCommand = binascii.unhexlify(CommandFromSettings)
+            AESEncryption = AES.new(str(RM3Key), AES.MODE_CBC, str(RM3IV))
+            EncodedCommand = AESEncryption.encrypt(str(DecodedCommand))
+            FinalCommand = EncodedCommand[0x04:]
+            EncodedCommand = FinalCommand.encode('hex')
+            BlackBeanControlIniFile = open(path.join(Settings.ApplicationDir, 'BlackBeanControl.ini'), 'w')
+            SettingsFile.set('Commands', SentCommand, EncodedCommand)
+            SettingsFile.write(BlackBeanControlIniFile)
+            BlackBeanControlIniFile.close()
+            sys.exit()
+        else:
+            print("Command appears to already be re-keyed.")
+            sys.exit(2)
     else:
         print("Command not found in ini file for re-key.")
         sys.exit(2)
