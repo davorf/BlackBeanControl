@@ -13,6 +13,7 @@ SettingsFile.optionxform = str
 SettingsFile.read(Settings.BlackBeanControlSettings)
 
 SentCommand = ''
+RekeyCommand = False
 DeviceName=''
 DeviceIPAddress = ''
 DevicePort = ''
@@ -24,19 +25,22 @@ AlternativeMACAddress = ''
 AlternativeTimeout = ''
 
 try:
-    Options, args = getopt.getopt(sys.argv[1:], 'c:d:i:p:m:t:h', ['command=','device=','ipaddress=','port=','macaddress=','timeout=','help'])
+    Options, args = getopt.getopt(sys.argv[1:], 'c:d:r:i:p:m:t:h', ['command=','device=','rekey=','ipaddress=','port=','macaddress=','timeout=','help'])
 except getopt.GetoptError:
-    print('BlackBeanControl.py -c <Command name> [-d <Device name>] [-i <IP Address>] [-p <Port>] [-m <MAC Address>] [-t <Timeout>]')
+    print('BlackBeanControl.py -c <Command name> [-d <Device name>] [-i <IP Address>] [-p <Port>] [-m <MAC Address>] [-t <Timeout>] [-r <Re-key Command>]')
     sys.exit(2)
 
 for Option, Argument in Options:
     if Option in ('-h', '--help'):
-        print('BlackBeanControl.py -c <Command name> [-d <Device name>] [-i <IP Address>] [-p <Port>] [-m <MAC Address>] [-t <Timeout>')
+        print('BlackBeanControl.py -c <Command name> [-d <Device name>] [-i <IP Address>] [-p <Port>] [-m <MAC Address>] [-t <Timeout> [-r <Re-key Command>]')
         sys.exit()
     elif Option in ('-c', '--command'):
         SentCommand = Argument
     elif Option in ('-d', '--device'):
         DeviceName = Argument
+    elif Option in ('-r', '--rekey'):
+        RekeyCommand = True
+        SentCommand = Argument
     elif Option in ('-i', '--ipaddress'):
         AlternativeIPAddress = Argument
     elif Option in ('-p', '--port'):
@@ -152,8 +156,30 @@ else:
 RM3Device = broadlink.rm((RealIPAddress, RealPort), RealMACAddress)
 RM3Device.auth()
 
-RM3Key = RM3Device.key
-RM3IV = RM3Device.iv
+if RekeyCommand:
+    if SettingsFile.has_option('Commands', SentCommand):
+        CommandFromSettings = SettingsFile.get('Commands', SentCommand)
+        print CommandFromSettings[0:4]
+        if CommandFromSettings[0:4] != '2600':
+            RM3Key = RM3Device.key
+            RM3IV = RM3Device.iv
+            DecodedCommand = binascii.unhexlify(CommandFromSettings)
+            AESEncryption = AES.new(str(RM3Key), AES.MODE_CBC, str(RM3IV))
+            EncodedCommand = AESEncryption.encrypt(str(DecodedCommand))
+            FinalCommand = EncodedCommand[0x04:]
+            EncodedCommand = FinalCommand.encode('hex')
+            BlackBeanControlIniFile = open(path.join(Settings.ApplicationDir, 'BlackBeanControl.ini'), 'w')
+            SettingsFile.set('Commands', SentCommand, EncodedCommand)
+            SettingsFile.write(BlackBeanControlIniFile)
+            BlackBeanControlIniFile.close()
+            sys.exit()
+        else:
+            print("Command appears to already be re-keyed.")
+            sys.exit(2)
+    else:
+        print("Command not found in ini file for re-key.")
+        sys.exit(2)
+
 
 if SettingsFile.has_option('Commands', SentCommand):
     CommandFromSettings = SettingsFile.get('Commands', SentCommand)
@@ -161,13 +187,15 @@ else:
     CommandFromSettings = ''
 
 if CommandFromSettings.strip() != '':
-    DecodedCommand = binascii.unhexlify(CommandFromSettings)
+    #DecodedCommand = binascii.unhexlify(CommandFromSettings)
 
-    AESEncryption = AES.new(str(RM3Key), AES.MODE_CBC, str(RM3IV))
-    EncodedCommand = AESEncryption.encrypt(str(DecodedCommand))
+    #AESEncryption = AES.new(str(RM3Key), AES.MODE_CBC, str(RM3IV))
+    #EncodedCommand = AESEncryption.encrypt(str(DecodedCommand))
     
-    FinalCommand = EncodedCommand[0x04:]    
-    RM3Device.send_data(FinalCommand)
+    #FinalCommand = EncodedCommand[0x04:]
+
+    DecodedCommand = CommandFromSettings.decode('hex')
+    RM3Device.send_data(DecodedCommand)
 else:
     RM3Device.enter_learning()
     time.sleep(RealTimeout)
@@ -177,14 +205,16 @@ else:
         print('Command not received')
         sys.exit()
 
-    AdditionalData = bytearray([0x00, 0x00, 0x00, 0x00])    
-    FinalCommand = AdditionalData + LearnedCommand
+    #AdditionalData = bytearray([0x00, 0x00, 0x00, 0x00])
+    #FinalCommand = AdditionalData + LearnedCommand
 
-    AESEncryption = AES.new(str(RM3Key), AES.MODE_CBC, str(RM3IV))
-    DecodedCommand = binascii.hexlify(AESEncryption.decrypt(str(FinalCommand)))
+    #AESEncryption = AES.new(str(RM3Key), AES.MODE_CBC, str(RM3IV))
+    #DecodedCommand = binascii.hexlify(AESEncryption.decrypt(str(FinalCommand)))
+
+    EncodedCommand = LearnedCommand.encoded('hex')
 
     BlackBeanControlIniFile = open(path.join(Settings.ApplicationDir, 'BlackBeanControl.ini'), 'w')    
-    SettingsFile.set('Commands', SentCommand, DecodedCommand)
+    SettingsFile.set('Commands', SentCommand, EncodedCommand)
     SettingsFile.write(BlackBeanControlIniFile)
     BlackBeanControlIniFile.close()
     
