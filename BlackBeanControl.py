@@ -200,7 +200,7 @@ else:
         print('Command not received')
         sys.exit()
 
-    EncodedCommand = LearnedCommand.encoded('hex')
+    EncodedCommand = LearnedCommand.encode('hex')
 
     BlackBeanControlIniFile = open(path.join(Settings.ApplicationDir, 'BlackBeanControl.ini'), 'w')    
     SettingsFile.set('Commands', SentCommand, EncodedCommand)
