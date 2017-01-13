@@ -13,7 +13,7 @@ SettingsFile.optionxform = str
 SettingsFile.read(Settings.BlackBeanControlSettings)
 
 SentCommand = ''
-RekeyCommand = False
+ReKeyCommand = False
 DeviceName=''
 DeviceIPAddress = ''
 DevicePort = ''
@@ -27,19 +27,19 @@ AlternativeTimeout = ''
 try:
     Options, args = getopt.getopt(sys.argv[1:], 'c:d:r:i:p:m:t:h', ['command=','device=','rekey=','ipaddress=','port=','macaddress=','timeout=','help'])
 except getopt.GetoptError:
-    print('BlackBeanControl.py -c <Command name> [-d <Device name>] [-i <IP Address>] [-p <Port>] [-m <MAC Address>] [-t <Timeout>] [-r <Re-key Command>]')
+    print('BlackBeanControl.py -c <Command name> [-d <Device name>] [-i <IP Address>] [-p <Port>] [-m <MAC Address>] [-t <Timeout>] [-r <Re-Key Command>]')
     sys.exit(2)
 
 for Option, Argument in Options:
     if Option in ('-h', '--help'):
-        print('BlackBeanControl.py -c <Command name> [-d <Device name>] [-i <IP Address>] [-p <Port>] [-m <MAC Address>] [-t <Timeout> [-r <Re-key Command>]')
+        print('BlackBeanControl.py -c <Command name> [-d <Device name>] [-i <IP Address>] [-p <Port>] [-m <MAC Address>] [-t <Timeout> [-r <Re-Key Command>]')
         sys.exit()
     elif Option in ('-c', '--command'):
         SentCommand = Argument
     elif Option in ('-d', '--device'):
         DeviceName = Argument
     elif Option in ('-r', '--rekey'):
-        RekeyCommand = True
+        ReKeyCommand = True
         SentCommand = Argument
     elif Option in ('-i', '--ipaddress'):
         AlternativeIPAddress = Argument
@@ -156,18 +156,20 @@ else:
 RM3Device = broadlink.rm((RealIPAddress, RealPort), RealMACAddress)
 RM3Device.auth()
 
-if RekeyCommand:
+if ReKeyCommand:
     if SettingsFile.has_option('Commands', SentCommand):
         CommandFromSettings = SettingsFile.get('Commands', SentCommand)
-        print CommandFromSettings[0:4]
+
         if CommandFromSettings[0:4] != '2600':
             RM3Key = RM3Device.key
             RM3IV = RM3Device.iv
+
             DecodedCommand = binascii.unhexlify(CommandFromSettings)
             AESEncryption = AES.new(str(RM3Key), AES.MODE_CBC, str(RM3IV))
             EncodedCommand = AESEncryption.encrypt(str(DecodedCommand))
             FinalCommand = EncodedCommand[0x04:]
             EncodedCommand = FinalCommand.encode('hex')
+
             BlackBeanControlIniFile = open(path.join(Settings.ApplicationDir, 'BlackBeanControl.ini'), 'w')
             SettingsFile.set('Commands', SentCommand, EncodedCommand)
             SettingsFile.write(BlackBeanControlIniFile)
@@ -177,7 +179,7 @@ if RekeyCommand:
             print("Command appears to already be re-keyed.")
             sys.exit(2)
     else:
-        print("Command not found in ini file for re-key.")
+        print("Command not found in ini file for re-keying.")
         sys.exit(2)
 
 
@@ -187,13 +189,6 @@ else:
     CommandFromSettings = ''
 
 if CommandFromSettings.strip() != '':
-    #DecodedCommand = binascii.unhexlify(CommandFromSettings)
-
-    #AESEncryption = AES.new(str(RM3Key), AES.MODE_CBC, str(RM3IV))
-    #EncodedCommand = AESEncryption.encrypt(str(DecodedCommand))
-    
-    #FinalCommand = EncodedCommand[0x04:]
-
     DecodedCommand = CommandFromSettings.decode('hex')
     RM3Device.send_data(DecodedCommand)
 else:
@@ -204,12 +199,6 @@ else:
     if LearnedCommand is None:
         print('Command not received')
         sys.exit()
-
-    #AdditionalData = bytearray([0x00, 0x00, 0x00, 0x00])
-    #FinalCommand = AdditionalData + LearnedCommand
-
-    #AESEncryption = AES.new(str(RM3Key), AES.MODE_CBC, str(RM3IV))
-    #DecodedCommand = binascii.hexlify(AESEncryption.decrypt(str(FinalCommand)))
 
     EncodedCommand = LearnedCommand.encoded('hex')
 
