@@ -163,13 +163,13 @@ if ReKeyCommand:
         if CommandFromSettings[0:4] != '2600':
             RM3Key = RM3Device.key
             RM3IV = RM3Device.iv
-            
+
             DecodedCommand = binascii.unhexlify(CommandFromSettings)
-            AESEncryption = AES.new(str(RM3Key), AES.MODE_CBC, str(RM3IV))            
-            EncodedCommand = AESEncryption.encrypt(str(DecodedCommand))            
+            AESEncryption = AES.new(str(RM3Key), AES.MODE_CBC, str(RM3IV))
+            EncodedCommand = AESEncryption.encrypt(str(DecodedCommand))
             FinalCommand = EncodedCommand[0x04:]
             EncodedCommand = FinalCommand.encode('hex')
-            
+
             BlackBeanControlIniFile = open(path.join(Settings.ApplicationDir, 'BlackBeanControl.ini'), 'w')
             SettingsFile.set('Commands', SentCommand, EncodedCommand)
             SettingsFile.write(BlackBeanControlIniFile)
@@ -200,7 +200,7 @@ else:
         print('Command not received')
         sys.exit()
 
-    EncodedCommand = LearnedCommand.encoded('hex')
+    EncodedCommand = LearnedCommand.encode('hex')
 
     BlackBeanControlIniFile = open(path.join(Settings.ApplicationDir, 'BlackBeanControl.ini'), 'w')    
     SettingsFile.set('Commands', SentCommand, EncodedCommand)
