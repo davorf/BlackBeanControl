@@ -1,10 +1,11 @@
-#!python2
+#!/usr/bin/python
 
 import broadlink, configparser
 import sys, getopt
 import time, binascii
 import netaddr
 import Settings
+import re
 from os import path
 from Crypto.Cipher import AES
 
@@ -54,6 +55,26 @@ if SentCommand.strip() == '':
     print('Command name parameter is mandatory')
     sys.exit(2)
 
+if SentCommand.strip() == 'DISCOVER':
+    print('Scanning network for Broadlink devices ... ')
+
+    mydevices = broadlink.discover(timeout=5)
+    print('Found ' + str(len(mydevices )) + ' broadlink device(s)')
+    time.sleep(1)
+    for index, item in enumerate(mydevices):
+
+      mydevices[index].auth()
+
+      m = re.match(r"\('([0-9.]+)', ([0-9]+)", str(mydevices[index].host))
+      ipadd = m.group(1)
+      port = m.group(2)
+
+      macadd = str(''.join(format(x, '02x') for x in mydevices[index].mac[::-1]))
+      macadd = macadd[:2] + ":" + macadd[2:4] + ":" + macadd[4:6] + ":" + macadd[6:8] + ":" + macadd[8:10] + ":" + macadd[10:12]
+
+      print('Device ' + str(index + 1) +':\nIPAddress = ' + ipadd + '\nPort = ' + port + '\nMACAddress = ' + macadd)
+    sys.exit(0)
+
 if (DeviceName.strip() != '') and ((AlternativeIPAddress.strip() != '') or (AlternativePort.strip() != '') or (AlternativeMACAddress.strip() != '') or (AlternativeTimeout != '')):
     print('Device name parameter can not be used in conjunction with IP Address/Port/MAC Address/Timeout parameters')
     sys.exit(2)
@@ -82,7 +103,7 @@ if DeviceName.strip() != '':
         if SettingsFile.has_option(DeviceName.strip(), 'Timeout'):
             DeviceTimeout = SettingsFile.get(DeviceName.strip(), 'Timeout')
         else:
-            DeviceTimeout = ''        
+            DeviceTimeout = ''
     else:
         print('Device does not exist in BlackBeanControl.ini')
         sys.exit(2)
@@ -101,7 +122,7 @@ if (DeviceName.strip() != '') and (DeviceMACAddress.strip() == ''):
 
 if (DeviceName.strip() != '') and (DeviceTimeout.strip() == ''):
     print('Timeout must exist in BlackBeanControl.ini for the selected device')
-    sys.exit(2)    
+    sys.exit(2)
 
 if DeviceName.strip() != '':
     RealIPAddress = DeviceIPAddress.strip()
@@ -151,7 +172,7 @@ if RealTimeout.strip() == '':
     print('Timeout must exist in BlackBeanControl.ini or it should be entered as a command line parameter')
     sys.exit(2)
 else:
-    RealTimeout = int(RealTimeout.strip())    
+    RealTimeout = int(RealTimeout.strip())
 
 RM3Device = broadlink.rm((RealIPAddress, RealPort), RealMACAddress)
 RM3Device.auth()
@@ -202,8 +223,8 @@ else:
 
     EncodedCommand = LearnedCommand.encode('hex')
 
-    BlackBeanControlIniFile = open(path.join(Settings.ApplicationDir, 'BlackBeanControl.ini'), 'w')    
+    BlackBeanControlIniFile = open(path.join(Settings.ApplicationDir, 'BlackBeanControl.ini'), 'w')
     SettingsFile.set('Commands', SentCommand, EncodedCommand)
     SettingsFile.write(BlackBeanControlIniFile)
     BlackBeanControlIniFile.close()
-    
+

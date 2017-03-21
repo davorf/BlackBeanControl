@@ -1,6 +1,8 @@
 # BlackBeanControl - Broadlink RM 3 Mini (aka Black Bean) control script
 
-A simple Python 2 script, which uses python-broadlink package. It can be used for both, learning and sending IR commands
+A simple Python 2 script, which uses python-broadlink package. It can be used for both, learning and sending IR commands.
+
+Even it was written for the RM 3 mini, it will perfectly work with other RM devices too. Tested with the RM pro.
 
 ### Installation
 
@@ -8,7 +10,7 @@ Before cloning/downloading the script, you should install all dependencies:
 
 Prerequisites for Linux users:
 
-- Install pip package: 
+- Install pip package (if not present): 
       * wget https://bootstrap.pypa.io/get-pip.py 
       * Run get-pip.py
 - Install python-dev package: apt-get install python-dev
@@ -21,16 +23,17 @@ Prerequisites for Windows users:
 
 Dependencies for Windows/Linux:
 
-- Install configparser package: python -m pip install configparser
-- Install netaddr package: python -m pip install netaddr
-- Install pycrypto package: python -m pip install pycrypto
-- Download python-broadlink package - you can find it on the github by the package name (github user: mjg59)
-- Unzip it to some local folder and install it: setup.py install
+- Install configparser package: `python -m pip install configparser`
+- Install netaddr package: `python -m pip install netaddr`
+- Install pycrypto package: `python -m pip install pycrypto`
+- Install broadlink package: `python -m pip install broadlink`
 
 Now you can clone/download BlackBeanControl (in case you download it as archive, unzip it to some local folder).
 
-### Configuration
+### Device Discovery
+Run `BlackBeanControl.py -c DISCOVER` to discover Broadlink devices. `DISCOVER` is a special codeword solely used for that purpose.
 
+### Configuration
 All required configuration is held within BlackBeanControl.ini file. It consists of the following parameters: 
 
 [General]
