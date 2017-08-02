@@ -23,10 +23,17 @@ Prerequisites for Windows users:
 
 Dependencies for Windows/Linux:
 
-- Install configparser package: `python -m pip install configparser`
-- Install netaddr package: `python -m pip install netaddr`
-- Install pycrypto package: `python -m pip install pycrypto`
-- Install broadlink package: `python -m pip install broadlink`
+- Install Python packages: `python -m pip install configparser netaddr pycrypto broadlink`
+
+Installation on a Synology NAS (DSM V6+):
+
+- Install pip package (if not present): 
+      * Run `wget https://bootstrap.pypa.io/get-pip.py`
+      * Run `sudo python get-pip.py`
+
+- Install Python-Module using DSM (provides pycrypto)
+
+- Install missing Python packages: `python -m pip install configparser netaddr broadlink`
 
 Now you can clone/download BlackBeanControl (in case you download it as archive, unzip it to some local folder).
 
