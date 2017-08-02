@@ -1,4 +1,4 @@
-#!/usr/bin/python2
+#!/bin/python
 
 import broadlink, configparser
 import sys, getopt
