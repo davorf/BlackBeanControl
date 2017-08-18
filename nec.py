@@ -109,8 +109,8 @@ if (MainCmd in ['d', 'e', 'p']) and (CommandFromSettings.strip() != ''):
     decoding = DecodeState[0]
 
     BinStr = '';
-    for indx in range(0, len(LenArray) - 2):
-        if (eq(9000, LenArray[indx]) and eq(4500, LenArray[indx + 1])):
+    for indx in range(0, len(LenArray) - 1):
+        if ((indx < len(LenArray) - 3) and eq(9000, LenArray[indx]) and eq(4500, LenArray[indx + 1]) and (300 < LenArray[indx + 2] < 1000)):
             decoding = '1bwait'
             print('--------------------------------------------')
             print('sequence started at indx:' + str(indx) + ' ' + str(LenArray[indx]))
