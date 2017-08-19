@@ -15,7 +15,7 @@ SettingsFile.read(Settings.BlackBeanControlSettings)
 
 SentCommand = ''
 ReKeyCommand = False
-NecCommand = False
+RealCommand = ''
 DeviceName=''
 DeviceIPAddress = ''
 DevicePort = ''
@@ -27,7 +27,7 @@ AlternativeMACAddress = ''
 AlternativeTimeout = ''
 
 try:
-    Options, args = getopt.getopt(sys.argv[1:], 'c:n:d:r:i:p:m:t:h', ['command=', 'command=','device=','rekey=','ipaddress=','port=','macaddress=','timeout=','help'])
+    Options, args = getopt.getopt(sys.argv[1:], 'c:n:s:d:r:i:p:m:t:h', ['command=', 'command=', 'command=','device=','rekey=','ipaddress=','port=','macaddress=','timeout=','help'])
 except getopt.GetoptError:
     print('BlackBeanControl.py -c <Command name> [-d <Device name>] [-i <IP Address>] [-p <Port>] [-m <MAC Address>] [-t <Timeout>] [-r <Re-Key Command>]')
     sys.exit(2)
@@ -35,11 +35,17 @@ except getopt.GetoptError:
 for Option, Argument in Options:
     if Option in ('-h', '--help'):
         print('BlackBeanControl.py -c <Command name> [-d <Device name>] [-i <IP Address>] [-p <Port>] [-m <MAC Address>] [-t <Timeout> [-r <Re-Key Command>]')
+        print('To control NEC     BlackBeanControl.py -n <Command HEX 4 byte> [-d <Device name>] [-i <IP Address>] [-p <Port>] [-m <MAC Address>] [-t <Timeout>')
+        print('To control Samsung BlackBeanControl.py -n <Command HEX 6 byte> [-d <Device name>] [-i <IP Address>] [-p <Port>] [-m <MAC Address>] [-t <Timeout>')
         sys.exit()
     elif Option in ('-c', '--command'):
+        RealCommand = 'c'
         SentCommand = Argument
     elif Option in ('-n', '--nec'):
-        NecCommand = True
+        RealCommand = 'n'
+        SentCommand = Argument
+    elif Option in ('-s', '--samsung'):
+        RealCommand = 's'
         SentCommand = Argument
     elif Option in ('-d', '--device'):
         DeviceName = Argument
@@ -187,7 +193,7 @@ if ReKeyCommand:
         print("Command not found in ini file for re-keying.")
         sys.exit(2)
 
-if NecCommand:
+if RealCommand == 'n':
     if (len(SentCommand) <> 8) or (not all(c in string.hexdigits for c in SentCommand)):
         print('Command must be 4-byte hex number.')
         sys.exit(2)
@@ -200,6 +206,21 @@ if NecCommand:
     RM3Device.send_data(EncodedCommand.decode('hex'))
 
     sys.exit()
+
+if RealCommand == 's':
+    if (len(SentCommand) <> 12) or (not all(c in string.hexdigits for c in SentCommand)):
+        print('Command must be 6-byte hex number.')
+        sys.exit(2)
+
+    BinStr = "".join('%s' % bin(int(SentCommand[i: i + 2], 16))[2:].zfill(8)[::-1] for i in xrange(0, 11, 2))
+    
+    # start sequence + Samsung start + data + end pulse + (here the copy)Samsung start + data + end pulse with long pause + end sequence
+    EncodedBinStr = "".join(('1434' if (c == '1') else '1414') for c in BinStr)
+    EncodedCommand = '2600ca00' + '9494' + EncodedBinStr + '1494' + '9494' + EncodedBinStr + '1400072a' + '000d05'
+ 
+    RM3Device.send_data(EncodedCommand.decode('hex'))
+    sys.exit()
+
 
 if SettingsFile.has_option('Commands', SentCommand):
     CommandFromSettings = SettingsFile.get('Commands', SentCommand)
