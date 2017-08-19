@@ -163,8 +163,7 @@ if (MainCmd in ['n']) and (SentCommand.strip() != ''):
 
     print('hex command=' + SentCommand)
     
-    BinArray = [];
-    BinArray[:] = [bin(int(SentCommand[i: i + 2], 16))[2:].zfill(8)[::-1] for i in xrange(0, 11, 2)];
+    BinArray = [bin(int(SentCommand[i: i + 2], 16))[2:].zfill(8)[::-1] for i in xrange(0, 11, 2)];
     BinStr = "".join('%s' % s for s in BinArray)
     print ('bin command=' + BinStr)
     

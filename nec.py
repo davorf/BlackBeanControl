@@ -18,14 +18,12 @@ def BinDecode(sbin):
         print('bin length error. len=' + str(len(sbin)))
         return False
 
-    BinArray = [sbin[7: : -1], sbin[15: 7: -1], sbin[23: 15: -1], sbin[31: 23: -1]]
-    HexArray = []
-    HexArray[:] = ['%02X' % int(x, 2) for x in BinArray]         
+    xbin = 'x' + sbin
+    BinArray = [xbin[i * 8: (i - 1) * 8: -1] for i in xrange(1, 5)]
+    HexArray = ['%02X' % int(x, 2) for x in BinArray]         
     
-    BinStr = "".join(' %s' % s for s in BinArray)
-    HexStr = "".join(' %s' % s for s in HexArray)
-    print('bin cmd' + BinStr)
-    print('hex cmd' + HexStr)
+    print('bin cmd' + "".join(' %s' % s for s in BinArray))
+    print('hex cmd' + "".join(' %s' % s for s in HexArray))
     print('dec cmd' + ''.join(' %03d' % int(b, 2) for b in BinArray))
     return True;
 
@@ -158,8 +156,7 @@ if (MainCmd in ['n']) and (SentCommand.strip() != ''):
 
     print('hex command=' + SentCommand)
     
-    BinArray = [];
-    BinArray[:] = [bin(int(SentCommand[i: i + 2], 16))[2:].zfill(8)[::-1] for i in xrange(0, 7, 2)];
+    BinArray = [bin(int(SentCommand[i: i + 2], 16))[2:].zfill(8)[::-1] for i in xrange(0, 7, 2)];
     BinStr = "".join('%s' % s for s in BinArray)
     print ('bin command=' + BinStr)
     

@@ -35,8 +35,8 @@ except getopt.GetoptError:
 for Option, Argument in Options:
     if Option in ('-h', '--help'):
         print('BlackBeanControl.py -c <Command name> [-d <Device name>] [-i <IP Address>] [-p <Port>] [-m <MAC Address>] [-t <Timeout> [-r <Re-Key Command>]')
-        print('To control NEC     BlackBeanControl.py -n <Command HEX 4 byte> [-d <Device name>] [-i <IP Address>] [-p <Port>] [-m <MAC Address>] [-t <Timeout>')
-        print('To control Samsung BlackBeanControl.py -n <Command HEX 6 byte> [-d <Device name>] [-i <IP Address>] [-p <Port>] [-m <MAC Address>] [-t <Timeout>')
+        print('To control NEC     BlackBeanControl.py -n <Command HEX 4 bytes> [-d <Device name>] [-i <IP Address>] [-p <Port>] [-m <MAC Address>] [-t <Timeout>')
+        print('To control Samsung BlackBeanControl.py -n <Command HEX 6 bytes> [-d <Device name>] [-i <IP Address>] [-p <Port>] [-m <MAC Address>] [-t <Timeout>')
         sys.exit()
     elif Option in ('-c', '--command'):
         RealCommand = 'c'
