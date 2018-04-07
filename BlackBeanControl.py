@@ -1,4 +1,4 @@
-#!python2
+#!/usr/bin/env python
 
 import broadlink, configparser
 import sys, getopt
@@ -16,25 +16,27 @@ SettingsFile.read(Settings.BlackBeanControlSettings)
 SentCommand = ''
 ReKeyCommand = False
 RealCommand = ''
-DeviceName=''
+DeviceName = ''
+DeviceModel = ''
 DeviceIPAddress = ''
 DevicePort = ''
 DeviceMACAddres = ''
 DeviceTimeout = ''
+AlternativeModel = ''
 AlternativeIPAddress = ''
 AlternativePort = ''
 AlternativeMACAddress = ''
 AlternativeTimeout = ''
 
 try:
-    Options, args = getopt.getopt(sys.argv[1:], 'c:n:s:d:r:i:p:m:t:h', ['command=', 'command=', 'command=','device=','rekey=','ipaddress=','port=','macaddress=','timeout=','help'])
+    Options, args = getopt.getopt(sys.argv[1:], 'c:n:s:d:o:r:i:p:m:t:h', ['command=', 'command=', 'command=','device=','model=','rekey=','ipaddress=','port=','macaddress=','timeout=','help'])
 except getopt.GetoptError:
-    print('BlackBeanControl.py -c <Command name> [-d <Device name>] [-i <IP Address>] [-p <Port>] [-m <MAC Address>] [-t <Timeout>] [-r <Re-Key Command>]')
+    print('BlackBeanControl.py -c <Command name> [-d <Device name>] [-o <Model>] [-i <IP Address>] [-p <Port>] [-m <MAC Address>] [-t <Timeout>] [-r <Re-Key Command>]')
     sys.exit(2)
 
 for Option, Argument in Options:
     if Option in ('-h', '--help'):
-        print('BlackBeanControl.py -c <Command name> [-d <Device name>] [-i <IP Address>] [-p <Port>] [-m <MAC Address>] [-t <Timeout> [-r <Re-Key Command>]')
+        print('BlackBeanControl.py -c <Command name> [-d <Device name>] [-o <Model>] [-i <IP Address>] [-p <Port>] [-m <MAC Address>] [-t <Timeout> [-r <Re-Key Command>]')
         print('To control NEC     BlackBeanControl.py -n <Command HEX 4 bytes> [-d <Device name>] [-i <IP Address>] [-p <Port>] [-m <MAC Address>] [-t <Timeout>')
         print('To control Samsung BlackBeanControl.py -n <Command HEX 6 bytes> [-d <Device name>] [-i <IP Address>] [-p <Port>] [-m <MAC Address>] [-t <Timeout>')
         sys.exit()
@@ -52,6 +54,8 @@ for Option, Argument in Options:
     elif Option in ('-r', '--rekey'):
         ReKeyCommand = True
         SentCommand = Argument
+    elif Option in ('-o', '--model'):
+        AlternativeModel = Argument
     elif Option in ('-i', '--ipaddress'):
         AlternativeIPAddress = Argument
     elif Option in ('-p', '--port'):
@@ -65,16 +69,21 @@ if SentCommand.strip() == '':
     print('Command name parameter is mandatory')
     sys.exit(2)
 
-if (DeviceName.strip() != '') and ((AlternativeIPAddress.strip() != '') or (AlternativePort.strip() != '') or (AlternativeMACAddress.strip() != '') or (AlternativeTimeout != '')):
-    print('Device name parameter can not be used in conjunction with IP Address/Port/MAC Address/Timeout parameters')
+if (DeviceName.strip() != '') and ((AlternativeModel.strip() != '') or (AlternativeIPAddress.strip() != '') or (AlternativePort.strip() != '') or (AlternativeMACAddress.strip() != '') or (AlternativeTimeout != '')):
+    print('Device name parameter can not be used in conjunction with Model/IP Address/Port/MAC Address/Timeout parameters')
     sys.exit(2)
 
-if (((AlternativeIPAddress.strip() != '') or (AlternativePort.strip() != '') or (AlternativeMACAddress.strip() != '') or (AlternativeTimeout.strip() != '')) and ((AlternativeIPAddress.strip() == '') or (AlternativePort.strip() == '') or (AlternativeMACAddress.strip() == '') or (AlternativeTimeout.strip() == ''))):
-    print('IP Address, Port, MAC Address and Timeout parameters can not be used separately')
+if (((AlternativeModel.strip() != '') or (AlternativeIPAddress.strip() != '') or (AlternativePort.strip() != '') or (AlternativeMACAddress.strip() != '') or (AlternativeTimeout.strip() != '')) and ((AlternativeModel.strip() == '') or (AlternativeIPAddress.strip() == '') or (AlternativePort.strip() == '') or (AlternativeMACAddress.strip() == '') or (AlternativeTimeout.strip() == ''))):
+    print('Model, IP Address, Port, MAC Address and Timeout parameters can not be used separately')
     sys.exit(2)
 
 if DeviceName.strip() != '':
     if SettingsFile.has_section(DeviceName.strip()):
+        if SettingsFile.has_option(DeviceName.strip(), 'Model'):
+            DeviceModel = SettingsFile.get(DeviceName.strip(), 'Model')
+        else:
+            DeviceModel = ''
+
         if SettingsFile.has_option(DeviceName.strip(), 'IPAddress'):
             DeviceIPAddress = SettingsFile.get(DeviceName.strip(), 'IPAddress')
         else:
@@ -98,6 +107,10 @@ if DeviceName.strip() != '':
         print('Device does not exist in BlackBeanControl.ini')
         sys.exit(2)
 
+if (DeviceName.strip() != '') and (DeviceModel.strip() == ''):
+    print('Model must exist in BlackBeanControl.ini for the selected device')
+    sys.exit(2)
+
 if (DeviceName.strip() != '') and (DeviceIPAddress.strip() == ''):
     print('IP address must exist in BlackBeanControl.ini for the selected device')
     sys.exit(2)
@@ -113,6 +126,17 @@ if (DeviceName.strip() != '') and (DeviceMACAddress.strip() == ''):
 if (DeviceName.strip() != '') and (DeviceTimeout.strip() == ''):
     print('Timeout must exist in BlackBeanControl.ini for the selected device')
     sys.exit(2)    
+
+if DeviceName.strip() != '':
+    RealModel = DeviceModel.strip()
+elif AlternativeModel.strip() != '':
+    RealModel = AlternativeModel.strip()
+else:
+    RealModel = Settings.Model
+
+if RealModel.strip() == '':
+    print('Model must exist in BlackBeanControl.ini or it should be entered as a command line parameter')
+    sys.exit(2)
 
 if DeviceName.strip() != '':
     RealIPAddress = DeviceIPAddress.strip()
@@ -164,7 +188,7 @@ if RealTimeout.strip() == '':
 else:
     RealTimeout = int(RealTimeout.strip())    
 
-RM3Device = broadlink.rm((RealIPAddress, RealPort), RealMACAddress)
+RM3Device = broadlink.rm((RealIPAddress, RealPort), RealMACAddress, RealModel)
 RM3Device.auth()
 
 if ReKeyCommand:

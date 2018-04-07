@@ -7,6 +7,7 @@ BlackBeanControlSettings = path.join(ApplicationDir, 'BlackBeanControl.ini')
 Settings = configparser.ConfigParser()
 Settings.read(BlackBeanControlSettings)
 
+Model = Settings.get('General', 'Model')
 IPAddress = Settings.get('General', 'IPAddress')
 Port = Settings.get('General', 'Port')
 MACAddress = Settings.get('General', 'MACAddress')
