@@ -34,6 +34,7 @@ Now you can clone/download BlackBeanControl (in case you download it as archive,
 All required configuration is held within BlackBeanControl.ini file. It consists of the following parameters: 
 
 [General]
+- Model - your device model hex code, find your own in gendevice function (devtype == 0x????): https://github.com/mjg59/python-broadlink/blob/master/broadlink/__init__.py
 - IPAddress - an IP address of RM 3 Mini (RM 3 Mini must have local IP address)
 - Port - a port used for UDP communication (in most cases, 80)
 - MACAddress - a MAC address of RM 3 Mini (should be in format: MM:MM:MM:SS:SS:SS)
@@ -42,11 +43,12 @@ All required configuration is held within BlackBeanControl.ini file. It consists
 [Commands]
 - This section should be populated by using the script, not manually
 
-Configuration file could optionally contain multiple device sections (with a custom names, must not contain any blanks). The device section must have all the parameters General section has. It allows user to control multiple RM 3 Minis without passing all the parameters separately (IP Address, Port, MAC Address and Timeout). Instead, only -d (--device) parameter should be passed, with a section name containing connection parameters for the specific device. 
+Configuration file could optionally contain multiple device sections (with a custom names, must not contain any blanks). The device section must have all the parameters General section has. It allows user to control multiple RM 3 Minis without passing all the parameters separately (Model, IP Address, Port, MAC Address and Timeout). Instead, only -d (--device) parameter should be passed, with a section name containing connection parameters for the specific device. 
 
 #### Example of a custom device section:
 ```
 [RM3LivingRoom]
+Model = 0x2737
 IPAddress = 192.168.0.1
 Port = 80
 MACAddress = AA:BB:CC:DD:EE:FF
@@ -55,19 +57,20 @@ Timeout = 30
 
 ### Syntax and usage
 ```
-BlackBeanControl.py -c <Command name> [-d <Device name>] [-i <IP Address>] [-p <Port>] [-m <MAC Address>] [-t <Timeout>] [-r <Re-key Command>]
+BlackBeanControl.py -c <Command name> [-d <Device name>] [-o <Model>] [-i <IP Address>] [-p <Port>] [-m <MAC Address>] [-t <Timeout>] [-r <Re-key Command>]
 ```
 
 Parameters explanation: 
 - Command name - mandatory parameter. If the sript is called with a command name not contained in the configuration file (BlackBeanControl.ini), it will start a learning process. After putting RM 3 Mini in the learning state, IR command should be sent to RM 3 Mini (usually a button press on the remote control). When defined timout expires, captured IR command will be saved in the configuration file - in the [Commands] section. In case the script is called with a command name contained in the configuration file, it will send that command to RM 3 Mini.
-- Device name - optional parameter. If the script is called with Device name parameter, IP address, port, MAC address and timeout parameters found in the General section of the configuration file will be ignored, and a script will use parameters found in a device section of the configuration file. Device name parameter can not be used in conjunction with IP Address, Port, MAC Address and Timeout command line parameters.
+- Device name - optional parameter. If the script is called with Device name parameter, Model, IP address, port, MAC address and timeout parameters found in the General section of the configuration file will be ignored, and a script will use parameters found in a device section of the configuration file. Device name parameter can not be used in conjunction with Model, IP Address, Port, MAC Address and Timeout command line parameters.
+- Model - optional parameter. If the script is called with Model parameter, model found in the configuration file will be ignored, and a script will use model from this parameter.
 - IP Address - optional parameter. If the script is called with IP Address parameter, IP address found in the configuration file will be ignored, and a script will use IP address from this parameter.
 - Port - optional parameter. If the script is called with Port parameter, port found in the configuration file will be ignored, and a script will use port from this parameter.
 - MAC Address - optional parameter. If the script is called with MAC address parameter, MAC address found in the configuration file will be ignored, and a script will use MAC address from this parameter.
 - Timeout - optional parameter. If the script is called with Timeout parameter, Timeout found in the configuration file will be ignored, and a script will use Timeout from this parameter.
 - Re-Key - optional parameter. This will re-key existing IR data to a new format that does not use the device key for storage. If the data was stored previously with a specific Broadlink device that device name will need to be provided for re-keying by providing a device name using -d parameter.
 
-IP Address, Port, MAC Address and Timeout command line parameters can not be used separately.
+Model, IP Address, Port, MAC Address and Timeout command line parameters can not be used separately.
 
 ### Donations
 
