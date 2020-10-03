@@ -1,31 +1,24 @@
 # BlackBeanControl - Broadlink RM 3 Mini (aka Black Bean) control script
 
-A simple Python 2 script, which uses python-broadlink package. It can be used for both, learning and sending IR commands
+A simple Python 3 script, which uses python-broadlink package. It can be used for both, learning and sending IR commands
 
 ### Installation
 
 Before cloning/downloading the script, you should install all dependencies: 
 
-Prerequisites for Linux users:
-
-- Install pip package: 
-      * wget https://bootstrap.pypa.io/get-pip.py 
-      * Run get-pip.py
-- Install python-dev package: apt-get install python-dev
-
 Prerequisites for Windows users:
 
-- Install Microsoft Visual C++ Compiler for Python 2.7
-      * Download https://www.microsoft.com/en-us/download/details.aspx?id=44266
-      * Run VCforPython27.msi
+- Install Microsoft Visual C++ Compiler for Python 3.X (choose the version for your platform)
+      * https://aka.ms/vs/16/release/VC_redist.x64.exe (x64)
+      * https://aka.ms/vs/16/release/VC_redist.arm64.exe (ARM64)
+      * https://aka.ms/vs/16/release/VC_redist.x86.exe (x86)
+      * Run the downloaded installer (VC_redist.{x64 | arm64 | x86}.exe)
 
 Dependencies for Windows/Linux:
 
-- Install configparser package: python -m pip install configparser
+- Install broadlink package: python -m pip install broadlink
 - Install netaddr package: python -m pip install netaddr
 - Install pycrypto package: python -m pip install pycrypto
-- Download python-broadlink package - you can find it on the github by the package name (github user: mjg59)
-- Unzip it to some local folder and install it: setup.py install
 
 Now you can clone/download BlackBeanControl (in case you download it as archive, unzip it to some local folder).
 
