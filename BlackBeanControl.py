@@ -1,4 +1,4 @@
-#!python2
+#!python
 
 import broadlink, configparser
 import sys, getopt
@@ -194,7 +194,7 @@ if ReKeyCommand:
         sys.exit(2)
 
 if RealCommand == 'n':
-    if (len(SentCommand) <> 8) or (not all(c in string.hexdigits for c in SentCommand)):
+    if (len(SentCommand) != 8) or (not all(c in string.hexdigits for c in SentCommand)):
         print('Command must be 4-byte hex number.')
         sys.exit(2)
 
@@ -208,7 +208,7 @@ if RealCommand == 'n':
     sys.exit()
 
 if RealCommand == 's':
-    if (len(SentCommand) <> 12) or (not all(c in string.hexdigits for c in SentCommand)):
+    if (len(SentCommand) != 12) or (not all(c in string.hexdigits for c in SentCommand)):
         print('Command must be 6-byte hex number.')
         sys.exit(2)
 
@@ -228,7 +228,7 @@ else:
     CommandFromSettings = ''
 
 if CommandFromSettings.strip() != '':
-    DecodedCommand = CommandFromSettings.decode('hex')
+    DecodedCommand = bytes.fromhex(CommandFromSettings)
     RM3Device.send_data(DecodedCommand)
 else:
     RM3Device.enter_learning()
@@ -239,7 +239,7 @@ else:
         print('Command not received')
         sys.exit()
 
-    EncodedCommand = LearnedCommand.encode('hex')
+    EncodedCommand = LearnedCommand.hex()
 
     BlackBeanControlIniFile = open(path.join(Settings.ApplicationDir, 'BlackBeanControl.ini'), 'w')    
     SettingsFile.set('Commands', SentCommand, EncodedCommand)
